@@ -1,0 +1,20 @@
+h3 {
+	text-align: center;
+}
+
+form {
+	padding-left: 25px;
+}
+
+#message {
+	margin-top: 1em;
+	padding-left: 25px;
+}
+
+.error {
+    color: red;
+}
+
+.success {
+    color: green;
+}

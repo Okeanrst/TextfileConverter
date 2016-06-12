@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Text file converter</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"   integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="   crossorigin="anonymous"></script>  
+    <link href="/css/style.css" media="screen" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+    <h3>Online converter files between the following formats: JSON, XML, YAML, CSV</h3>
+    <form method="post" action="handler.php" enctype="multipart/form-data">   
+      <input type="file" name="inputfile" required >
+      <p>Select file format</p>
+      <p><select name="format" required>
+        <option value>----</option>
+        <option value="json">JSON</option>
+        <option value="xml">XML</option>
+        <option value="yaml">YAML</option>
+        <option value="csv">CSV</option>
+      </select></p>
+      <input type="submit" name="send" value="Load file">
+    </form>
+    <div id="message"><div>
+    <script type="text/javascript" src="js/mainscript.js"></script>
+  </body>
+</html>
