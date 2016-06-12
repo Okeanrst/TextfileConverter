@@ -1,24 +1,19 @@
 <?php
 
-error_reporting(E_ALL);
-ini_set("display_errors", 1);
+//error_reporting(E_ALL);
+ini_set("display_errors", 0);
 
 ini_set('upload_max_size' , '6M');
 ini_set('post_max_size', '5M');
 
 require '../vendor/autoload.php';
 require '../vendor/json2xml/src/Processus/Serializer/XmlRpcValue.php';
-//require '../vendor/othervendor/csvtoxml.php';
 require '../vendor/okeanrst/common/src/prepareDataToCsv.php';
 
-
-use League\Csv\Reader as CsvReader;
 use Symfony\Component\Yaml\Yaml as YamlParser;
 use Symfony\Component\Yaml\Exception\ParseException as YamlParseException;
-
 use Goodby\CSV\Export\Standard\Exporter;
 use Goodby\CSV\Export\Standard\ExporterConfig;
-
 
 $errormsg = [];
 
@@ -87,93 +82,49 @@ if (isset($_POST['send']) || $isAjax) {
         finfo_close($finfo);
     
         if (in_array($type, ['text/plain', 'application/json', 'text/csv', 'application/xml', 'text/yaml'])) {
-            //try {
+            try {
                 if ($type == 'application/xml') {
                     $inputMimeType = 'xml';
                     $handle = fopen($tmp_name, 'r');
                     $xmlString = fread($handle, filesize($tmp_name));
-                    fclose($handle);
-                    $xmlObject = new SimpleXMLElement($xmlString);
-                    //$xmlArray =  json_decode(json_encode($xmlObject), true);
+                    fclose($handle);                    
                     $reader = new Zend\Config\Reader\XML();
-                    $xmlArray   = $reader->fromString($xmlString);
-                    
-                    //var_dump($xmlArray);
-                    //$xml = simplexml_load_file($tmp_name);
-                    //$craur = Craur::createFromXml($xmlString);
+                    $dataArray   = $reader->fromString($xmlString);                    
                 } elseif ($type == 'application/json' || $type == 'text/plain' && $extention == 'json') {
                     $inputMimeType = 'json';
                     $handle = fopen($tmp_name, 'r');
                     $jsonString = fread($handle, filesize($tmp_name));
                     fclose($handle);
-                    $jsonArray = json_decode($jsonString, true);
-                    //$craur = Craur::createFromJson($jsonString);
+                    $dataArray = json_decode($jsonString, true);                    
                 } elseif ($type == 'text/csv' || $type == 'text/plain' && $extention == 'csv') {
-                    $inputMimeType = 'csv';
-                    $handle = fopen($tmp_name, 'r');
-                    //$csv_string = fread($handle, filesize($tmp_name));                    
-                    $csvReader = CsvReader::createFromPath($tmp_name);
-                    /*$csvArray = [];
-                    while (($data = fgetcsv($handle)) !== FALSE) {
-                        $csvArray[] = $data;
-                    }*/
-                    fclose($handle);
+                    $inputMimeType = 'csv';                    
                     $csvObj = new mnshankar\CSV\CSV();
-                    $csvArray = $csvObj->fromFile($tmp_name)->toArray();
-                    
+                    $dataArray = $csvObj->fromFile($tmp_name)->toArray();                    
                 } elseif ($type == 'text/yaml' || $type == 'text/plain' && $extention == 'yaml') {
-                    $inputMimeType = 'yaml';
-                    //$craur = Craur::createFromYamlFile(file_get_contents($tmp_name));                    
+                    $inputMimeType = 'yaml';                    
                     try {
-                        $yamlObject = YamlParser::parse(file_get_contents($tmp_name), YamlParser::PARSE_DATETIME);
+                        $dataArray = YamlParser::parse(file_get_contents($tmp_name), YamlParser::PARSE_DATETIME);
                     } catch (YamlParseException $e) {
                         sprintf("Unable to parse the YAML string: %s", $e->getMessage());
                         array_push($errormsg, sprintf("Unable to parse the YAML string: %s", $e->getMessage()));
-                    }
-                    $yamlArray = json_decode(json_encode($yamlObject), true);
-                    //$craur = new Craur($yamlArray);                    
+                    }                                                     
                 }
 
                 switch ($outFormat) {
                     case 'xml':
                         $newName = 'data/'.$idleName.'.xml';
-                        $handle = fopen($newName, 'w');
-                        if ($inputMimeType == 'csv') {                            
-                            $serializer = new \Processus\Serializer\XmlRpcValue();
-                            $serializer->setEncoding('UTF-8');
-                            $xmlString = $serializer->encode($csvArray);
-                        } elseif ($inputMimeType == 'json') {
-                            $serializer = new \Processus\Serializer\XmlRpcValue();
-                            $serializer->setEncoding('UTF-8');
-                            $xmlString = $serializer->encode(json_decode($jsonString, true));
-
-                        } elseif ($inputMimeType == 'yaml') {
-                            $serializer = new \Processus\Serializer\XmlRpcValue();
-                            $serializer->setEncoding('UTF-8');
-                            $xmlString = $serializer->encode($yamlArray);
-                        }                        
+                        $handle = fopen($newName, 'w');                                                    
+                        $serializer = new \Processus\Serializer\XmlRpcValue();
+                        $serializer->setEncoding('UTF-8');
+                        $xmlString = $serializer->encode($dataArray);                        
                         fwrite($handle, $xmlString);
                         fclose($handle);
                         break;
                     
                     case 'json':
                         $newName = 'data/'.$idleName.'.json';
-                        $handle = fopen($newName, 'w');
-                        if ($inputMimeType == 'csv') {
-                           
-                        
-                        $jsonString = json_encode($csvArray);
-                        
-                         
-
-
-                        } elseif ($inputMimeType == 'xml') {
-                            //$jsonString = json_encode($xmlObject);
-                            $jsonString = json_encode($xmlArray);
-                        } elseif ($inputMimeType == 'yaml') {
-                            //$jsonString = $craur->toJsonString();
-                            $jsonString = json_encode($yamlObject);
-                        }                        
+                        $handle = fopen($newName, 'w');                        
+                        $jsonString = json_encode($dataArray);                        
                         $newName = 'data/'.$idleName.'.json';
                         $handle = fopen($newName, 'w');
                         fwrite($handle, $jsonString);
@@ -181,74 +132,30 @@ if (isset($_POST['send']) || $isAjax) {
                         break;
 
                     case 'csv':
-                        $newName = 'data/'.$idleName.'.csv';
-                                                
-                        if ($inputMimeType == 'yaml') {
-                            //var_dump($yamlArray);
-                            $prepareYamlArray = prepareDataXmlYamlToCsv($yamlArray);
-                            //var_dump($prepareYamlArray);
-                            /*$csvObj = new mnshankar\CSV\CSV();
-                            $csvObj->with($prepareYamlArray)->put($newName);*/
+                        $newName = 'data/'.$idleName.'.csv';                                                
+                        if ($inputMimeType == 'yaml' || $inputMimeType == 'xml') {                            
+                            $prepareArray = prepareDataXmlYamlToCsv($dataArray);                            
                             $config = new ExporterConfig();
                             $exporter = new Exporter($config);                      
-                            $exporter->export($newName, $prepareYamlArray);
-                        } elseif ($inputMimeType == 'xml') {
-                            
-                            
-                            /*$header=false;
-                            foreach($xml as $k=>$details){
-                                if(!$header){
-                                    fputcsv($handle, array_keys(get_object_vars($details)));
-                                    $header=true;
-                                }
-                                fputcsv($handle, get_object_vars($details));
-                            }*/
-                            //var_dump($xmlArray);
-                            $prepareXmlArray = prepareDataXmlYamlToCsv($xmlArray);
-                            var_dump($prepareXmlArray);
-                            /*$csvObj = new mnshankar\CSV\CSV();
-                            $csvObj->with($prepareXmlArray)->put($newName);*/
+                            $exporter->export($newName, $prepareArray);                                                    
+                        } elseif ($inputMimeType == 'json') {                            
+                            $prepareArray = prepareDataJsonToCsv($dataArray);
                             $config = new ExporterConfig();
                             $exporter = new Exporter($config);                      
-                            $exporter->export($newName, $prepareXmlArray);
-
-
-                            
-                        } elseif ($inputMimeType == 'json') {
-                            //var_dump($jsonArray);
-                            $prepareJsonArray = prepareDataJsonToCsv($jsonArray);
-                            //var_dump($prepareJsonArray);
-                            /*$handle = fopen($newName, 'w');
-                            fputcsv($handle, $jsonArray);
-                            fclose($handle);*/
-                            /*$csvObj = new mnshankar\CSV\CSV();
-                            $csvObj->with($jsonArray)->put($newName);*/
-                            
-                            $config = new ExporterConfig();
-                            $exporter = new Exporter($config);                      
-                            $exporter->export($newName, $prepareJsonArray);
-                        }                        
-                        
+                            $exporter->export($newName, $prepareArray);
+                        }
                         break;
 
                     case 'yaml':
                         $newName = 'data/'.$idleName.'.yaml';
-                        $handle = fopen($newName, 'w');
-                        if ($inputMimeType == 'csv') {
-                            $dataArray = $csvArray;                                                      
-                        } elseif ($inputMimeType == 'xml') {                            
-                            $dataArray = $xmlArray;
-                            //fwrite($handle, YamlParser::dump($xmlObject, 2, 4, false, true));                            
-                        } elseif ($inputMimeType == 'json') {
-                            $dataArray = $jsonArray;                                                        
-                        }
+                        $handle = fopen($newName, 'w');                        
                         fwrite($handle, YamlParser::dump($dataArray, 5, 4));                        
                         fclose($handle);
                         break;
                 }
-            /*} catch (Exception $e) {
+            } catch (Exception $e) {
                 array_push($errormsg, "File conversion error.");
-            }*/
+            }
             
         } else {            
             array_push($errormsg, 'Invalid mimetype input file');            

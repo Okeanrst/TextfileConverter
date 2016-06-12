@@ -1,13 +1,9 @@
 $(document).ready(function() {               
-    //$("form").submit(processingForm);
+    $("form").submit(processingForm);
 
     $( document ).ajaxStart(function() {
-        console.log('ajaxStart');        
-    });
-
-    $( document ).ajaxStop(function() {
-        console.log('ajaxStop');
-    });
+        $('#message').html('<div class="success"><p>File processing...</p></div>');        
+    });    
 
     function processingForm(event) {
         event.stopPropagation();

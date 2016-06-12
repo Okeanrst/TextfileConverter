@@ -2,9 +2,7 @@
     "name": "okeanrst/textfileconverter",    
     "license": "MIT",    
     "require": {
-        "php": ">=5.5",        
-        "dracoblue/craur": "dev-master",
-        "league/csv": "^8.0",        
+        "php": ">=5.5",
         "zendframework/zend-config": "dev-master",
         "zendframework/zend-xmlrpc": "dev-master",
         "mnshankar/CSV": "1.8",

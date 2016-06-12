@@ -43,8 +43,7 @@ function prepareDataXmlYamlToCsv(array $inputArray) {
 							$tmp[] = '';
 						}
 					}
-					$values[] = $tmp;
-					//if (!in_array($title[], haystack))
+					$values[] = $tmp;					
 				}
 
 			}
@@ -81,8 +80,7 @@ function prepareDataJsonToCsv(array $inputArray) {
 		} else {
 			$csvArray[] = [$key, $value];
 		}
-	}				
-		
+	}
 	
 	return $csvArray;
 }
