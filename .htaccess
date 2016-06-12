@@ -1,3 +1,0 @@
-php_value max_input_vars "1000"
-php_value max_input_time "180"
-php_value max_file_uploads "100"
