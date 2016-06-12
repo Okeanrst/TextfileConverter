@@ -16,6 +16,8 @@ Clone the repository and manually invoke `composer` using the shipped
     cd TextfileConverter
     php composer.phar self-update
     php composer.phar install
+    cd vendor
+    git clone https://github.com/bastman/json2xml.git
 
 Web Server Setup
 ----------------
