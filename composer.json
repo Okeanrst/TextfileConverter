@@ -5,6 +5,7 @@
         "php": ">=5.5",
         "zendframework/zend-config": "dev-master",
         "zendframework/zend-xmlrpc": "dev-master",
+        "symfony/yaml": "dev-master",
         "mnshankar/CSV": "1.8",
         "goodby/csv": "*"
     }
