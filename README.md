@@ -13,7 +13,7 @@ Clone the repository and manually invoke `composer` using the shipped
 
     cd my/project/dir
     git clone https://github.com/Okeanrst/TextfileConverter.git
-    cd textfileconverter
+    cd TextfileConverter
     php composer.phar self-update
     php composer.phar install
 
