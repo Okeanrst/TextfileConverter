@@ -1,9 +1,9 @@
-Simple converter xml, yml, json, csv files
+Simple converter xml, yaml, json, csv files
 =======================
 
 Introduction
 ------------
-This application provides a simple functional to convert files between the following formats : xml, yml, json, csv.
+This application provides a simple functional to convert files between the following formats : xml, yaml, json, csv.
 
 Installation
 ------------
